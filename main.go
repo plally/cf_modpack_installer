@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"encoding/json"
+	"fmt"
 )
 var modsDirectory = "mods/"
 
@@ -23,11 +24,11 @@ func main() {
 
 	manifest, err := loadManifest("temp/cursedownloader/manifest.json")
 	log.Infof("Downloading mods from manifest.json %v", manifest.Name)
+	fmt.Println(len(manifest.Files))
 	m := ModDownloader{
 		Manifest: manifest,
-		FileUrlCache: make(map[int]string),
 	}
-	downloadUrlChannel := make(chan string, 256)
+	downloadUrlChannel := make(chan string)
 
 	go m.FetchDownloadUrls(downloadUrlChannel)
 	DownloadFromFilesChannel(downloadUrlChannel, "mods/")

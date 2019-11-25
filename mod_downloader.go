@@ -4,53 +4,44 @@ import (
 	"net/http"
 	"errors"
 	"os"
-	"github.com/plally/curseforge/twitchapi"
 	"path"
 	"io"
 	log "github.com/sirupsen/logrus"
+	"github.com/plally/curseforge_modpack_downloader/twitchapi"
+	"time"
+	"path/filepath"
 )
 
 type ModDownloader struct {
 	*Manifest
-	FileUrlCache map[int]string
-}
-
-func (m *ModDownloader) getCachedUrl(addonID int) (string, bool) {
-	url, ok := m.FileUrlCache[addonID]
-	return url, ok
-}
-
-func (m *ModDownloader) setCachedUrl(addonID int, url string) {
-	m.FileUrlCache[addonID] = url
 }
 
 func (m *ModDownloader) FetchDownloadUrls(ch chan string) {
-	for _, file := range m.Files {
-		info, err := twitchapi.GetAddonInfo(file.ProjectID)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-		if _, ok := m.getCachedUrl(file.ProjectID); ok {
-			continue
-		}
-
-		for _, f := range info.LatestFiles {
-			if f.ID == file.FileID {
-				m.setCachedUrl(file.ProjectID, f.DownloadURL)
-				ch <- f.DownloadURL
-				log.Debugf("Download url retrieved %v", f.DownloadURL)
-				break
-			}
-		}
+	for _, manifestFile := range m.Files {
+		url, err := m.GetFileURL(manifestFile)
+		if err != nil { log.Fatal(err) }
+		log.Debugf("fetched download url %v", url)
+		ch <- url
 	}
+	log.Info("Finished fetching download urls ")
+	time.Sleep(time.Second*1)
 	close(ch)
-	log.Info("Finished fetching download urls")
+
+
 }
 
+func (m *ModDownloader) GetFileURL(f *CurseForgeFile) (string, error) {
+	url, err := twitchapi.GetDownloadUrl(f.ProjectID, f.FileID)
+	return url, err
+}
+
+
 func DownloadFromFilesChannel(ch chan string, directory string) {
+	os.MkdirAll(directory, os.ModePerm)
 	for url := range ch {
-		DownloadFile(url, directory + path.Base(url))
+		fpath := filepath.Join(directory, path.Base(url))
+		log.Debugf("Downloading file %v to %v", url, fpath)
+		DownloadFile(url, fpath)
 	}
 }
 

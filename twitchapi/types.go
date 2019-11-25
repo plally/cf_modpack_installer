@@ -3,8 +3,9 @@ package twitchapi
 import "time"
 
 type Dependency struct {
-	Type    int `json:"Type"`
-	AddonID int `json:"AddonId"`
+	Type    int `json:"type"`
+	AddonID int `json:"addonId"`
+	FileID int `json:"fileId"`
 }
 
 type Module struct {
