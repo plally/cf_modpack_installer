@@ -2,17 +2,19 @@ package main
 
 import (
 	"archive/zip"
-	"path/filepath"
-	"os"
+	"fmt"
 	"io"
 	"io/ioutil"
-	"fmt"
+	"os"
+	"path/filepath"
 )
 
 func unzipFile(location, dest string) (err error) {
 	fmt.Println(location)
 	r, err := zip.OpenReader(location)
-	if err != nil {return}
+	if err != nil {
+		return
+	}
 	defer r.Close()
 
 	for _, f := range r.File {
@@ -26,13 +28,18 @@ func unzipFile(location, dest string) (err error) {
 			return
 		}
 		rc, err := f.Open()
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 
-
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 
 		out, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 		io.Copy(out, rc)
 		out.Close()
 		rc.Close()
@@ -51,19 +58,23 @@ func copyDirectory(src, dest string) error {
 
 		if entry.IsDir() {
 			err = copyDirectory(srcpath, destpath)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 		} else {
 			err = copy(srcpath, destpath)
-			if err != nil { return err }
+			if err != nil {
+				return err
+			}
 		}
 
 	}
 	return nil
 }
 
-func copy(src, dest string) error{
+func copy(src, dest string) error {
 	os.MkdirAll(filepath.Dir(dest), os.ModePerm)
-	newFile, err  := os.Create(dest)
+	newFile, err := os.Create(dest)
 	if err != nil {
 		return err
 	}

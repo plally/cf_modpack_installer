@@ -1,11 +1,11 @@
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
-	"os"
-	"io/ioutil"
 	"encoding/json"
 	"flag"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	logLevel := flag.String("loglevel", "debug", "")
 	flag.Parse()
 
-	level,  err := log.ParseLevel(*logLevel)
+	level, err := log.ParseLevel(*logLevel)
 	if err != nil {
 		level = log.DebugLevel
 	}
@@ -49,9 +49,11 @@ func main() {
 	DownloadFromFilesChannel(downloadUrlChannel, filepath.Join(*installDir, "mods"))
 }
 
-func loadManifest(fpath string) (m *Manifest, err error){
+func loadManifest(fpath string) (m *Manifest, err error) {
 	data, err := ioutil.ReadFile(fpath)
-	if err != nil {return nil, err}
+	if err != nil {
+		return nil, err
+	}
 	err = json.Unmarshal(data, &m)
 	return m, err
 }
