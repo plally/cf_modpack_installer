@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	zipLocation := flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and override")
+	zipLocation := flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and overrides")
 	installDir := flag.String("installdir", "", "The directory to create the mods and config director")
 	logLevel := flag.String("loglevel", "debug", "")
 	flag.Parse()
@@ -23,8 +23,10 @@ func main() {
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 	log.SetOutput(os.Stdout)
 
-	tempPath := filepath.Join(*installDir, "temp/cursedownloader/")
+	tempPath := filepath.Join(*installDir, "temp", "cursedownloader")
 	manifestPath := filepath.Join(tempPath, "manifest.json")
+	overridesPath := filepath.Join(tempPath, "overrides")
+	modsPath := filepath.Join(*installDir, "mods")
 
 	log.Info("Unzipping")
 	err = unzipFile(*zipLocation, tempPath)
@@ -33,7 +35,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = copyDirectory(filepath.Join(tempPath, "overrides/"), *installDir)
+	err = copyDirectory(overridesPath, *installDir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,7 +48,7 @@ func main() {
 	downloadUrlChannel := make(chan string)
 
 	go m.FetchDownloadUrls(downloadUrlChannel)
-	DownloadFromFilesChannel(downloadUrlChannel, filepath.Join(*installDir, "mods"))
+	DownloadFromFilesChannel(downloadUrlChannel, modsPath)
 }
 
 func loadManifest(fpath string) (m *Manifest, err error) {
