@@ -3,35 +3,50 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 	"os"
-	"archive/zip"
-	"path/filepath"
-	"io"
 	"io/ioutil"
 	"encoding/json"
-	"fmt"
+	"flag"
+	"path/filepath"
 )
-var modsDirectory = "mods/"
 
 func main() {
-	log.SetLevel(log.DebugLevel)
+	zipLocation := flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and override")
+	installDir := flag.String("installdir", "", "The directory to create the mods and config director")
+	logLevel := flag.String("loglevel", "debug", "")
+	flag.Parse()
+
+	level,  err := log.ParseLevel(*logLevel)
+	if err != nil {
+		level = log.DebugLevel
+	}
+	log.SetLevel(level)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 	log.SetOutput(os.Stdout)
 
-	err := unzipFile("test/cfc_mc.zip", "temp/cursedownloader")
+	tempPath := filepath.Join(*installDir, "temp/cursedownloader/")
+	manifestPath := filepath.Join(tempPath, "manifest.json")
+
+	log.Info("Unzipping")
+	err = unzipFile(*zipLocation, tempPath)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	manifest, err := loadManifest("temp/cursedownloader/manifest.json")
+	err = copyDirectory(filepath.Join(tempPath, "overrides/"), *installDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	manifest, err := loadManifest(manifestPath)
 	log.Infof("Downloading mods from manifest.json %v", manifest.Name)
-	fmt.Println(len(manifest.Files))
+
 	m := ModDownloader{
 		Manifest: manifest,
 	}
 	downloadUrlChannel := make(chan string)
 
 	go m.FetchDownloadUrls(downloadUrlChannel)
-	DownloadFromFilesChannel(downloadUrlChannel, "mods/")
+	DownloadFromFilesChannel(downloadUrlChannel, filepath.Join(*installDir, "mods"))
 }
 
 func loadManifest(fpath string) (m *Manifest, err error){
@@ -39,34 +54,4 @@ func loadManifest(fpath string) (m *Manifest, err error){
 	if err != nil {return nil, err}
 	err = json.Unmarshal(data, &m)
 	return m, err
-}
-
-func unzipFile(location, dest string) (err error) {
-	r, err := zip.OpenReader(location)
-	if err != nil {return}
-	defer r.Close()
-
-	for _, f := range r.File {
-		fpath := filepath.Join(dest, f.Name)
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(fpath, os.ModePerm)
-			continue
-		}
-		err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm)
-		if err != nil {
-			return
-		}
-		rc, err := f.Open()
-		if err != nil { return err }
-
-
-		if err != nil { return err }
-
-		out, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-		if err != nil { return err }
-		io.Copy(out, rc)
-		out.Close()
-		rc.Close()
-	}
-	return
 }
