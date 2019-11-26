@@ -1,7 +1,5 @@
-# curseforge_modpack_downloader
-Download modpacks from curseforge without a gui
-
-## example command:
+# cf_modpack_installer
+### example command:
 ```
-curseforge_modpack_downloader --modzip "mc_modpack.zip" --installdir "minecraft/"
+cf_modpack_downloader --modzip "mc_modpack.zip" --installdir "minecraft/"
 ```
