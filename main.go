@@ -7,12 +7,15 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func main() {
+	startTime := time.Now()
 	zipLocation := flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and overrides")
 	installDir := flag.String("installdir", "", "The directory to create the mods and config director")
 	logLevel := flag.String("loglevel", "debug", "")
+	workerAmount := flag.Int("workers", 15, "amount of goroutines to use to download mod files")
 	flag.Parse()
 
 	level, err := log.ParseLevel(*logLevel)
@@ -41,6 +44,7 @@ func main() {
 	}
 	manifest, err := loadManifest(manifestPath)
 	log.Infof("Downloading mods from manifest.json %v", manifest.Name)
+	log.Infof("Using %v goroutines", *workerAmount)
 
 	m := ModDownloader{
 		Manifest: manifest,
@@ -48,7 +52,8 @@ func main() {
 	downloadUrlChannel := make(chan string)
 
 	go m.FetchDownloadUrls(downloadUrlChannel)
-	DownloadFromFilesChannel(downloadUrlChannel, modsPath)
+	DownloadFilesFromChannel(downloadUrlChannel, modsPath, *workerAmount)
+	log.Infof("Finished installing modpack, took %v", time.Since(startTime))
 }
 
 func loadManifest(fpath string) (m *Manifest, err error) {
