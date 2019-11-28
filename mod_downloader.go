@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"github.com/plally/curseforge_modpack_downloader/twitchapi"
+	"github.com/plally/cf_modpack_installer/twitchapi"
 	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
