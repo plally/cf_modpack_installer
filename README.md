@@ -1,4 +1,6 @@
 # cf_modpack_installer
+downloads all content given a modpack zip from curseforge 
+
 #### command usage:
 ```
 -installdir string
@@ -10,6 +12,7 @@
 -workers int
   amount of goroutines to use to download mod files (default 15)
 ```
+
 #### examples
 * `cf_modpack_installer --modzip "mc_modpack.zip"`
 * `cf_modpack_installer --modzip "mc_modpack.zip" --installdir "/home/name/.minecraft/" --workers 20`
