@@ -15,7 +15,7 @@ downloads all content given a modpack zip from curseforge
 
 #### examples
 * `cf_modpack_installer --modzip "mc_modpack.zip"`
-* `cf_modpack_installer --modzip "mc_modpack.zip" --installdir "/home/name/.minecraft/" --workers 20`
+* `cf_modpack_installer --modzip "mc_modpack.zip" --installdir "/home/steve/.minecraft/" --workers 20`
 
 
 
