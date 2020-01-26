@@ -22,14 +22,15 @@ func main() {
 	if err != nil {
 		level = log.DebugLevel
 	}
+
 	log.SetLevel(level)
 	log.SetFormatter(&log.TextFormatter{ForceColors: true})
 	log.SetOutput(os.Stdout)
 
-	tempPath := filepath.Join(*installDir, "temp", "cursedownloader")
-	manifestPath := filepath.Join(tempPath, "manifest.json")
+	tempPath      := filepath.Join(*installDir, "temp", "cursedownloader")
+	manifestPath  := filepath.Join(tempPath, "manifest.json")
 	overridesPath := filepath.Join(tempPath, "overrides")
-	modsPath := filepath.Join(*installDir, "mods")
+	modsPath      := filepath.Join(*installDir, "mods")
 
 	log.Info("Unzipping")
 	err = unzipFile(*zipLocation, tempPath)
