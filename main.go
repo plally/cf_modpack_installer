@@ -10,12 +10,17 @@ import (
 	"time"
 )
 
+var (
+	zipLocation  = flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and overrides")
+	installDir   = flag.String("installdir", "", "The directory to create the mods and config director")
+	logLevel     = flag.String("loglevel", "debug", "")
+	workerAmount = flag.Int("workers", 15, "amount of goroutines to use to download mod files")
+)
+
 func main() {
-	startTime := time.Now()
-	zipLocation := flag.String("modzip", "", "Curseforge modpack zip file containing a manifest.json and overrides")
-	installDir := flag.String("installdir", "", "The directory to create the mods and config director")
-	logLevel := flag.String("loglevel", "debug", "")
-	workerAmount := flag.Int("workers", 15, "amount of goroutines to use to download mod files")
+	startTime  := time.Now()
+
+
 	flag.Parse()
 
 	level, err := log.ParseLevel(*logLevel)
@@ -43,17 +48,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	manifest, err := loadManifest(manifestPath)
+	if err != nil { log.Fatal(err) }
+
 	log.Infof("Downloading mods from manifest.json %v", manifest.Name)
 	log.Infof("Using %v goroutines", *workerAmount)
 
 	m := ModDownloader{
 		Manifest: manifest,
 	}
+
 	downloadUrlChannel := make(chan string)
 
-	go m.FetchDownloadUrls(downloadUrlChannel)
+	var done = make(chan bool)
+	go func() {
+		defer func() { close(done) }()
+		m.FetchDownloadUrls(downloadUrlChannel)
+	}()
+
 	DownloadFilesFromChannel(downloadUrlChannel, modsPath, *workerAmount)
+	<- done
 	log.Infof("Finished installing modpack, took %v", time.Since(startTime))
 }
 

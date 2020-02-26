@@ -10,7 +10,6 @@ import (
 	"path"
 	"path/filepath"
 	"sync"
-	"time"
 )
 
 type ModDownloader struct {
@@ -27,7 +26,6 @@ func (m *ModDownloader) FetchDownloadUrls(ch chan string) {
 		ch <- url
 	}
 	log.Info("Finished fetching download urls ")
-	time.Sleep(time.Second * 1)
 	close(ch)
 
 }
@@ -44,6 +42,7 @@ func DownloadFilesFromChannel(ch chan string, directory string, workers int) {
 		go DownloadFilesWorker(ch, directory, &wg)
 	}
 	wg.Wait()
+
 }
 
 func DownloadFilesWorker(ch chan string, directory string, wg *sync.WaitGroup) {
