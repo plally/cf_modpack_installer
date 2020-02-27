@@ -21,7 +21,7 @@ func get(url string) (resp *http.Response, err error) {
 	if err != nil {
 		return
 	}
-	req.Header.Set("User-Agent", "Simple_mc_Modpack_downloader/1.0")
+	req.Header.Set("User-Agent", "CFMPI/1.0")
 	for i := 1; i < MAX_TRIES; i++ {
 		resp, err = client.Do(req)
 		if err != nil {
