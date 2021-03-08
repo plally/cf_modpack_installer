@@ -10,10 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1.14
+    - uses: plally/go-release-action@v1.14
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: linux
         goarch: amd64
-        binary_name: cfmi_linux_amd64
 
+  release-windows-amd64:
+    name: release linux/amd64
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: plally/go-release-action@v1.14
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: windows
+        goarch: amd64
+
+
+  release-darwin-amd64:
+    name: release linux/amd64
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: plally/go-release-action@v1.14
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: darwin
+        goarch: amd64
