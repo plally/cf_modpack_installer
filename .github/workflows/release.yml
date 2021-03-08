@@ -15,5 +15,5 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: linux
         goarch: amd64
-		binary_name: cfmi_linux_amd64
+        binary_name: cfmi_linux_amd64
 
