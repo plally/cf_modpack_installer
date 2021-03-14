@@ -1,6 +1,8 @@
 # cf_modpack_installer
 downloads all content given a modpack zip from curseforge 
 
+You can download compiled binaries from the releases tab for OS X, Windows, or Linux. Alternatively you can build the project yourself with the go tool `go build .` in the root directory of this project.
+
 #### command usage:
 ```
 -installdir string
